@@ -1,0 +1,7 @@
+fastapi
+langchain 
+langchain-google-vertexai 
+langchain-google-community[featurestore]
+langchain_community
+uvicorn
+pdfplumber

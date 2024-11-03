@@ -1,0 +1,26 @@
+services:
+  server:
+    image: server  
+    build:
+      context: ./server
+    ports:
+      - "8000:8000"
+    volumes:
+      - ${GCLOUD_CONFIG}:/root/.config/gcloud/application_default_credentials.json
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/root/.config/gcloud/application_default_credentials.json
+      - PROJECT_ID=${PROJECT_ID}
+      - REGION=${REGION}
+      - DATASET=${DATASET}
+      - TABLE=${TABLE}
+
+  client:
+    build:
+      context: ./client
+    ports:
+      - "8501:8501"
+    volumes:
+      - ${GCLOUD_CONFIG}:/root/.config/gcloud/application_default_credentials.json
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/root/.config/gcloud/application_default_credentials.json
+
