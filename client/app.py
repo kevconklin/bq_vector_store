@@ -17,7 +17,7 @@ if st.sidebar.button("Upload PDF"):
     if pdf_url:
         # Send PDF URL to backend API
         response = requests.post(backend_url, 
-            payload={
+            json={
                 "pdf_url": pdf_url
                 }
             )

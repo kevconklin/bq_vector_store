@@ -26,7 +26,7 @@ TABLE = os.getenv('TABLE')
 # create embedding and llm model objects
 embedding = VertexAIEmbeddings(
     model_name="textembedding-gecko@latest", project=PROJECT_ID)
-llm = VertexAI(model_name="gemini-pro")
+llm = VertexAI(model_name="gemini-1.5-flash-002")
 
 # bigquery as a vector store
 store = BigQueryVectorStore(
@@ -43,8 +43,6 @@ retriever = store.as_retriever(
     }
 )
 
-
-# 2. Incorporate the retriever into a question-answering chain.
 system_prompt = (
     "You are an assistant for question-answering tasks. "
     "Use the following pieces of retrieved context to answer "
@@ -89,17 +87,24 @@ question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
 rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
 
 @app.post("/upload_pdf")
-async def upload_pdf(pdf_url: str):
+async def upload_pdf(request: Request):
     """ 
     Function that uploads a pdf to a BigQuery vector store
     Input must be a url.
 
     Args:
-        pdf_url (str): url to pdf file
+        request (Request): the post request from client. Must
+        contain json data with 'pdf_url' key.
+
 
     Returns:
         (dict): successful message
     """
+    
+    # get data from request
+    json_data = await request.json()
+    pdf_url = json_data['pdf_url']
+    
     loader = PDFPlumberLoader(pdf_url)
     docs = loader.load()
 
@@ -115,7 +120,8 @@ async def upload_pdf(pdf_url: str):
 
 @app.post("/ask_question")
 async def ask_question(request: Request):
-    """_summary_
+    """
+    Allows a question to be asked to the chains defined above.
 
     Args:
         request (Request): the post request from client. Must
@@ -136,12 +142,14 @@ async def ask_question(request: Request):
         }
     )
     
+    answer = response["answer"]
+    
     # extend in memory chat store
     chat_history.extend(
         [
             HumanMessage(content=question),
-            AIMessage(content=response["answer"]),
+            AIMessage(content=answer),
         ]
     )
     
-    return response['answer']
+    return answer
