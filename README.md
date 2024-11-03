@@ -2,6 +2,8 @@
 
 Example Retrieval Augmented Generation (RAG) application using Google Cloud for relevant services; BigQuery as a Vector Store and Vertex AI for model services.
 
+See reference [Medium article]([url](https://medium.com/@kevinconklin_17818/using-bigquery-as-a-vector-store-b1ca91371854)) for more detailed walkthrough
+
 ## Running the application
 
 To run the application, create a `.env` in the root directory using the `.env.example` file as reference. Ensure all Google Cloud APIs are enabled and logged in via the Google Cloud CLI.
